@@ -8,10 +8,6 @@ namespace GrantTracker.Api.Services;
 
 public sealed class TaskService(GrantTrackerDbContext db, TimeProvider timeProvider)
 {
-    /// <summary>
-    /// BR-4. Always returns 200 with the current state of the task. A second completion is a no-op, so a
-    /// retried request (OP-3) gets the same answer as the first and the original date is preserved.
-    /// </summary>
     public async Task<TaskResponse> CompleteAsync(Guid id, CancellationToken ct)
     {
         var task = await db.Tasks.SingleOrDefaultAsync(t => t.Id == id, ct)
@@ -23,7 +19,6 @@ public sealed class TaskService(GrantTrackerDbContext db, TimeProvider timeProvi
         return TaskResponse.From(task, today);
     }
 
-    /// <summary>BR-6. Most overdue first means earliest due date first; ties broken by grant reference, then title.</summary>
     public async Task<IReadOnlyList<OverdueTaskResponse>> OverdueAsync(CancellationToken ct)
     {
         var today = timeProvider.Today();

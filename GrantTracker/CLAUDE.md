@@ -37,6 +37,8 @@ was used, not on volume. A small, correct, well-tested change beats a large one.
 
 ## Conventions
 
+- No code comments. Names and structure carry the meaning; explanations go in README or AI_USAGE.md.
+
 - British spelling in domain names (`OrganisationName`), matching the spec.
 - `GrantTask`, not `Task`, to avoid clashing with `System.Threading.Tasks.Task`.
 - Enums stored as strings. Keep it that way; the support team reads rows directly.

@@ -3,12 +3,6 @@ using GrantTracker.Domain.Enums;
 
 namespace GrantTracker.Data;
 
-/// <summary>
-/// Seed data from section 6 of the exercise. Dates are relative to the office's today so the
-/// overdue logic can always be demonstrated. Ids are fixed so the .http file and tests can refer to them.
-/// Rows are written directly rather than through the domain methods because the seed deliberately
-/// contains tasks that are already overdue, which BR-2 would reject.
-/// </summary>
 public static class DatabaseSeeder
 {
     public static class GrantIds
@@ -39,15 +33,12 @@ public static class DatabaseSeeder
         var zone = timeProvider.LocalTimeZone;
         var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
 
-        // CreatedOn is a timestamp; for seed rows it is midnight, office time, on the application date.
         DateTimeOffset Midnight(DateOnly date)
         {
             var local = date.ToDateTime(TimeOnly.MinValue);
             return new DateTimeOffset(local, zone.GetUtcOffset(local));
         }
 
-        // Assumptions not stated in the spec: a seed task was created on the grant's application date,
-        // and a completed seed task was completed on its due date.
         var riversideApplied = today.AddDays(-60);
         var northsideApplied = today.AddDays(-20);
         var harbourApplied = today.AddDays(-200);

@@ -2,10 +2,6 @@ using GrantTracker.Domain.Enums;
 
 namespace GrantTracker.Domain.Entities;
 
-/// <summary>
-/// Aggregate root. All changes to a grant or its task list go through methods here so the
-/// business rules have exactly one home and can be unit-tested without a database.
-/// </summary>
 public class Grant
 {
     public Guid Id { get; set; }
@@ -14,21 +10,12 @@ public class Grant
     public DateOnly ApplicationDate { get; set; }
     public GrantStatus Status { get; set; } = GrantStatus.Open;
 
-    /// <summary>
-    /// Optimistic concurrency token. Every method that changes the grant or its task list bumps it,
-    /// so EF Core's UPDATE ... WHERE Version = @original fails if another officer changed the grant
-    /// in between. This is what keeps BR-1 and BR-5 true under concurrent use (OP-2).
-    /// </summary>
     public int Version { get; set; }
 
     public List<GrantTask> Tasks { get; set; } = [];
 
     public bool IsClosed => Status == GrantStatus.Closed;
 
-    /// <summary>
-    /// Adds a task, enforcing BR-1, BR-2 and BR-3. <paramref name="now"/> is the current time in the
-    /// office's time zone: its date is "today" for BR-2 and the instant is recorded as CreatedOn.
-    /// </summary>
     public GrantTask AddTask(string? title, TaskPriority priority, DateOnly dueDate, DateTimeOffset now)
     {
         var today = DateOnly.FromDateTime(now.DateTime);
@@ -66,10 +53,6 @@ public class Grant
         return task;
     }
 
-    /// <summary>
-    /// Closes the grant, enforcing BR-5. Requires <see cref="Tasks"/> to be loaded.
-    /// Closing an already-closed grant is a no-op, for the same reason as BR-4: a retried request must be safe.
-    /// </summary>
     public bool Close()
     {
         if (IsClosed)

@@ -4,10 +4,6 @@ using GrantTracker.Domain.Enums;
 
 namespace GrantTracker.Api.Contracts;
 
-/// <summary>
-/// Shape validation only (400). Title has no attribute on purpose: BR-3 is enforced once, in the domain,
-/// and reported as a business-rule error (422) like the other rules.
-/// </summary>
 public sealed class CreateTaskRequest
 {
     public string? Title { get; init; }
@@ -35,7 +31,6 @@ public sealed record TaskResponse(
             task.IsCompleted, task.IsOverdue(today));
 }
 
-/// <summary>Overdue list row. Carries the grant reference and organisation so the list reads on its own.</summary>
 public sealed record OverdueTaskResponse(
     Guid Id,
     Guid GrantId,

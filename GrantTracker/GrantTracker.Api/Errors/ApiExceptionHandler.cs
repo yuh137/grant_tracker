@@ -5,12 +5,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrantTracker.Api.Errors;
 
-/// <summary>
-/// Maps domain and persistence exceptions to ProblemDetails with one status code per failure kind:
-/// 404 unknown id, 409 concurrent modification, 422 business rule (with a "code" field such as "BR-5").
-/// Shape errors (missing field, bad enum) are 400 from model validation, and anything else falls through
-/// to the framework default 500 ProblemDetails.
-/// </summary>
 public sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken ct)

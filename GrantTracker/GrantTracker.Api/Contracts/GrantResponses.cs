@@ -3,7 +3,6 @@ using GrantTracker.Domain.Enums;
 
 namespace GrantTracker.Api.Contracts;
 
-/// <summary>Row in the grants list. PendingTaskCount is computed in the query, never stored.</summary>
 public sealed record GrantSummaryResponse(
     Guid Id,
     string Reference,

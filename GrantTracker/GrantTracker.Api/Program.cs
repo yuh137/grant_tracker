@@ -12,12 +12,9 @@ builder.Services
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 
-// Every error, including unhandled ones, comes back as RFC 7807 ProblemDetails.
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
-// Time is injected (framework TimeProvider) so tests can pin the date. "Today" is the office's
-// calendar day, from Office:TimeZone, not the machine's; without it a UTC container shifts the day.
 var officeZoneId = builder.Configuration["Office:TimeZone"];
 builder.Services.AddSingleton<TimeProvider>(officeZoneId is null
     ? TimeProvider.System
@@ -51,7 +48,6 @@ using (var scope = app.Services.CreateScope())
 
 app.Run();
 
-/// <summary>Makes the entry point visible to WebApplicationFactory in the integration tests.</summary>
 public partial class Program
 {
 }
