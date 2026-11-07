@@ -1,0 +1,53 @@
+@host = http://localhost:5180
+
+# Seed ids (fixed, see GrantTracker.Data/DatabaseSeeder.cs)
+@riverside = 00000000-0000-0000-0000-000000000001
+@northside = 00000000-0000-0000-0000-000000000002
+@harbour = 00000000-0000-0000-0000-000000000003
+@hillview = 00000000-0000-0000-0000-000000000004
+@riversideVerifyBank = 00000000-0000-0000-0000-000000000101
+
+### List all grants with pending task counts
+GET {{host}}/grants
+Accept: application/json
+
+### List open grants only
+GET {{host}}/grants?status=Open
+Accept: application/json
+
+### One grant with its tasks
+GET {{host}}/grants/{{riverside}}
+Accept: application/json
+
+### Add a task (dueDate must be today or later)
+POST {{host}}/grants/{{hillview}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Confirm incorporation certificate",
+  "priority": "Medium",
+  "dueDate": "2030-01-01"
+}
+
+### BR-1: task on a closed grant -> 422
+POST {{host}}/grants/{{harbour}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Should fail",
+  "priority": "Low",
+  "dueDate": "2030-01-01"
+}
+
+### BR-4: complete a task (run twice; completedOn must not change)
+PUT {{host}}/tasks/{{riversideVerifyBank}}/complete
+
+### BR-5: close a grant with a pending High task -> 422
+PUT {{host}}/grants/{{riverside}}/close
+
+### Close a grant with no pending High task
+PUT {{host}}/grants/{{hillview}}/close
+
+### Overdue tasks, most overdue first
+GET {{host}}/tasks/overdue
+Accept: application/json
