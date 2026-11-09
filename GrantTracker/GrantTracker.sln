@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrantTracker.Domain", "Gran
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrantTracker.Data", "GrantTracker.Data\GrantTracker.Data.csproj", "{3CDDEE5E-B08B-4816-9DD9-8512826DC8C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrantTracker.Tests", "GrantTracker.Tests\GrantTracker.Tests.csproj", "{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,18 @@ Global
 		{3CDDEE5E-B08B-4816-9DD9-8512826DC8C0}.Release|x64.Build.0 = Release|Any CPU
 		{3CDDEE5E-B08B-4816-9DD9-8512826DC8C0}.Release|x86.ActiveCfg = Release|Any CPU
 		{3CDDEE5E-B08B-4816-9DD9-8512826DC8C0}.Release|x86.Build.0 = Release|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Debug|x64.Build.0 = Debug|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Debug|x86.Build.0 = Debug|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Release|x64.ActiveCfg = Release|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Release|x64.Build.0 = Release|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Release|x86.ActiveCfg = Release|Any CPU
+		{E5CAF839-58B5-4726-BEF9-4DFEAC2631C0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

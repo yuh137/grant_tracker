@@ -15,7 +15,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
-var officeZoneId = builder.Configuration["Office:TimeZone"];
+var officeZoneId = builder.Configuration["OfficeTimeZone"];
 builder.Services.AddSingleton<TimeProvider>(officeZoneId is null
     ? TimeProvider.System
     : new OfficeTimeProvider(TimeZoneInfo.FindSystemTimeZoneById(officeZoneId)));
@@ -42,12 +42,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<GrantTrackerDbContext>();
     var timeProvider = scope.ServiceProvider.GetRequiredService<TimeProvider>();
-    var recreate = app.Configuration.GetValue<bool>("Database:RecreateOnStartup");
+    var recreate = app.Configuration.GetValue<bool>("RecreateDatabaseOnStartup");
     DatabaseInitializer.Initialize(db, timeProvider, recreate);
 }
 
 app.Run();
-
-public partial class Program
-{
-}

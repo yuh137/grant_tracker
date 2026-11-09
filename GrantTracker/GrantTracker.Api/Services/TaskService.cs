@@ -1,4 +1,4 @@
-using GrantTracker.Api.Contracts;
+using GrantTracker.Api.DTO;
 using GrantTracker.Data;
 using GrantTracker.Domain;
 using GrantTracker.Domain.Entities;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrantTracker.Api.Services;
 
-public sealed class TaskService(GrantTrackerDbContext db, TimeProvider timeProvider)
+public class TaskService(GrantTrackerDbContext db, TimeProvider timeProvider)
 {
     public async Task<TaskResponse> CompleteAsync(Guid id, CancellationToken ct)
     {

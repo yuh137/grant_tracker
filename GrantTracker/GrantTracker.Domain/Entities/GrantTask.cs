@@ -17,8 +17,8 @@ public class GrantTask
     public DateTimeOffset CreatedOn { get; set; }
     public DateOnly? CompletedOn { get; set; }
 
-    public bool IsCompleted => CompletedOn is not null;
-    public bool IsPending => CompletedOn is null;
+    public bool IsCompleted => CompletedOn != null;
+    public bool IsPending => CompletedOn == null;
 
     public bool IsOverdue(DateOnly today) => IsPending && DueDate < today;
 
@@ -41,12 +41,12 @@ public class GrantTask
         var trimmed = title?.Trim();
         if (string.IsNullOrEmpty(trimmed))
         {
-            throw new BusinessRuleException("BR-3", "The task title is required.");
+            throw new BusinessRuleException(BusinessRuleErrorCode.InvalidTitle, "The task title is required.");
         }
 
         if (trimmed.Length > MaxTitleLength)
         {
-            throw new BusinessRuleException("BR-3", $"The task title must be {MaxTitleLength} characters or fewer.");
+            throw new BusinessRuleException(BusinessRuleErrorCode.InvalidTitle, $"The task title must be {MaxTitleLength} characters or fewer.");
         }
 
         return trimmed;

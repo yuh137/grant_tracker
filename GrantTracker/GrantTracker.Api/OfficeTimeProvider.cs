@@ -1,6 +1,6 @@
 namespace GrantTracker.Api;
 
-public sealed class OfficeTimeProvider(TimeZoneInfo officeZone) : TimeProvider
+public class OfficeTimeProvider(TimeZoneInfo officeZone) : TimeProvider
 {
     public override TimeZoneInfo LocalTimeZone => officeZone;
 }

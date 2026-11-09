@@ -1,34 +1,38 @@
 # GrantTracker
 
-Take-home exercise: a small Grant Task Tracker for grants officers. ASP.NET Core Web API +
+A small Grant Task Tracker for grants officers. ASP.NET Core Web API +
 EF Core (SQLite) + React/TypeScript. Assessed on judgement, correctness, tests and how the AI
 was used, not on volume. A small, correct, well-tested change beats a large one.
 
 ## Layout
 
+Repository root holds the solution folder `GrantTracker/`, the front end `GrantTrackerApp/`,
+`test.sh`, README.md and TESTING.md.
+
 | Project | Owns | Depends on |
 |---|---|---|
 | `GrantTracker.Domain` | `Entities/` (with the business rules), `Enums/`, exceptions at the root | nothing |
 | `GrantTracker.Data` | `GrantTrackerDbContext`, EF configuration, seed data | Domain, EF Core |
-| `GrantTracker.Api` | Controllers, DTOs (`Contracts/`), orchestration services, ProblemDetails mapping | Domain, Data |
-| `GrantTracker.Tests` | xUnit: domain unit tests + API integration tests | all |
-| `client/` | Vite + React + TypeScript single screen | API over HTTP |
+| `GrantTracker.Api` | Controllers, DTOs (`DTO/`), orchestration services, ProblemDetails mapping | Domain, Data |
+| `GrantTracker.Tests` | xUnit: `Domain/` unit tests, `Api/` integration tests on in-memory SQLite + `FakeTimeProvider` | all |
+| `GrantTrackerApp/` | Vite + React + TypeScript single screen, Vitest; proxies `/grants` and `/tasks` to the API | API over HTTP |
 
 ## Rules that must hold
 
-- Business rules BR-1 to BR-6 live in `Grant` and `GrantTask` methods, nowhere else.
+- Business rules live in `Grant` and `GrantTask` methods, nowhere else.
   Services load, call the domain method, save, map. Controllers only route.
 - Never call `DateTime.Now`, `DateTime.Today`, `DateTimeOffset.Now` or `TimeProvider.System`
   in Domain, Data or services. Time comes from the injected `TimeProvider`, whose local zone
-  is the office's (`Office:TimeZone`). Domain methods take `today` or `now` as a parameter.
+  is the office's (`OfficeTimeZone`). Domain methods take `today` or `now` as a parameter.
 - Dates from people (application, due, completed) are `DateOnly`. Timestamps from the system
   (`CreatedOn`) are `DateTimeOffset`. Never `DateTime` on entities.
-- A rule violation throws `BusinessRuleException(code, message)` with the spec's code
-  (`"BR-1"` ...). `ApiExceptionHandler` maps it to 422 ProblemDetails with a `code` field.
+- A rule violation throws `BusinessRuleException(BusinessRuleCode, message)`. Add new codes to the
+  `BusinessRuleCode` enum, never as strings. `ApiExceptionHandler` maps it to 422 ProblemDetails with a
+  `code` field holding the enum's name. The name is part of the API contract: renaming a value breaks clients.
   Unknown id: `NotFoundException` -> 404. `DbUpdateConcurrencyException` -> 409.
   Shape errors are 400 from model validation. Do not add other error shapes.
 - Any method that changes a grant or its task list bumps `Grant.Version`. That is the
-  concurrency guard for BR-1 and BR-5.
+  concurrency guard for adding a task and closing a grant.
 - Completing and closing are idempotent: repeating returns 200 with unchanged state.
 - Every rule and every bug fix gets a test. Tests pin the date with `FakeTimeProvider` and must
   not depend on the real date or on test order.
@@ -38,22 +42,25 @@ was used, not on volume. A small, correct, well-tested change beats a large one.
 ## Conventions
 
 - No code comments. Names and structure carry the meaning; explanations go in README or AI_USAGE.md.
-
 - British spelling in domain names (`OrganisationName`), matching the spec.
 - `GrantTask`, not `Task`, to avoid clashing with `System.Threading.Tasks.Task`.
 - Enums stored as strings. Keep it that way; the support team reads rows directly.
 - No new NuGet packages without saying why. `nuget.config` pins restore to nuget.org.
-- Comments explain a decision or a rule reference, not what the code does.
+- Front end: plain `fetch` in `src/api.ts`, no data library. `ConnectionError` means the API could not be
+  reached (rejected fetch, or a 5xx without a ProblemDetails body from a proxy); `ApiError` carries ProblemDetails.
 
 ## Commands
 
 ```
-dotnet build                                   # whole solution
-dotnet run --project GrantTracker.Api          # http://localhost:5180, recreates + seeds the DB
-dotnet test                                    # all tests, one command
+dotnet build GrantTracker/GrantTracker.sln                 # whole solution
+dotnet run --project GrantTracker/GrantTracker.Api         # http://localhost:5180, recreates + seeds the DB
+dotnet test GrantTracker/GrantTracker.sln                  # back-end tests
+npm --prefix GrantTrackerApp run dev                       # http://localhost:5173, proxies to the API
+npm --prefix GrantTrackerApp test                          # front-end tests
+./test.sh                                                  # every test, one command (Git Bash on Windows)
 ```
 
-OpenAPI document: `GET /openapi/v1.json` in Development. Requests to try: `GrantTracker.Api.http`.
+OpenAPI document: `GET /openapi/v1.json` in Development. Requests to try: `GrantTracker/GrantTracker.Api/GrantTracker.Api.http`.
 
 ## Working with the AI
 

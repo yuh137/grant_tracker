@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using GrantTracker.Domain.Enums;
 
 namespace GrantTracker.Domain.Entities;
@@ -22,19 +23,19 @@ public class Grant
 
         if (IsClosed)
         {
-            throw new BusinessRuleException("BR-1", "A task cannot be added to a closed grant.");
+            throw new BusinessRuleException(BusinessRuleErrorCode.GrantClosed, "A task cannot be added to a closed grant.");
         }
 
         var validTitle = GrantTask.ValidateTitle(title);
 
         if (dueDate < today)
         {
-            throw new BusinessRuleException("BR-2", "The due date cannot be in the past.");
+            throw new BusinessRuleException(BusinessRuleErrorCode.InvalidDueDate, "The due date cannot be in the past.");
         }
 
         if (dueDate < ApplicationDate)
         {
-            throw new BusinessRuleException("BR-2", "The due date cannot be before the grant's application date.");
+            throw new BusinessRuleException(BusinessRuleErrorCode.InvalidDueDate, "The due date cannot be before the grant's application date.");
         }
 
         var task = new GrantTask
@@ -62,7 +63,7 @@ public class Grant
 
         if (Tasks.Any(t => t.IsPending && t.Priority == TaskPriority.High))
         {
-            throw new BusinessRuleException("BR-5", "A grant cannot be closed while it has a pending High-priority task.");
+            throw new BusinessRuleException(BusinessRuleErrorCode.PendingHighPriorityTask, "A grant cannot be closed while it has a pending High-priority task.");
         }
 
         Status = GrantStatus.Closed;

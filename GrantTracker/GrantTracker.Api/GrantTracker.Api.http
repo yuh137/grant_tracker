@@ -29,7 +29,7 @@ Content-Type: application/json
   "dueDate": "2030-01-01"
 }
 
-### BR-1: task on a closed grant -> 422
+### Task on a closed grant -> 422
 POST {{host}}/grants/{{harbour}}/tasks
 Content-Type: application/json
 
@@ -39,10 +39,10 @@ Content-Type: application/json
   "dueDate": "2030-01-01"
 }
 
-### BR-4: complete a task (run twice; completedOn must not change)
+### Complete a task (run twice; completedOn must not change)
 PUT {{host}}/tasks/{{riversideVerifyBank}}/complete
 
-### BR-5: close a grant with a pending High task -> 422
+### Close a grant with a pending High task -> 422
 PUT {{host}}/grants/{{riverside}}/close
 
 ### Close a grant with no pending High task

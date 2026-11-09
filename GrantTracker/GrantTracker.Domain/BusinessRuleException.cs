@@ -1,9 +1,10 @@
+using GrantTracker.Domain.Enums;
+
 namespace GrantTracker.Domain;
 
-public sealed class BusinessRuleException(string code, string message) : Exception(message)
+public class BusinessRuleException(BusinessRuleErrorCode errorCode, string message) : Exception(message)
 {
-    public string Code { get; } = code;
+    public BusinessRuleErrorCode ErrorCode { get; } = errorCode;
 }
 
-public sealed class NotFoundException(string entity, Guid id)
-    : Exception($"{entity} '{id}' was not found.");
+public class NotFoundException(string entity, Guid id) : Exception($"{entity} '{id}' was not found.");

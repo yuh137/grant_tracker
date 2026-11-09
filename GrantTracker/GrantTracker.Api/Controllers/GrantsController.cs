@@ -1,4 +1,4 @@
-using GrantTracker.Api.Contracts;
+using GrantTracker.Api.DTO;
 using GrantTracker.Api.Services;
 using GrantTracker.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -7,37 +7,40 @@ namespace GrantTracker.Api.Controllers;
 
 [ApiController]
 [Route("grants")]
-[Produces("application/json")]
-public sealed class GrantsController(GrantService grants) : ControllerBase
+public class GrantsController : ControllerBase
 {
-    [HttpGet]
-    [ProducesResponseType<IReadOnlyList<GrantSummaryResponse>>(StatusCodes.Status200OK)]
-    public Task<IReadOnlyList<GrantSummaryResponse>> List([FromQuery] GrantStatus? status, CancellationToken ct) =>
-        grants.ListAsync(status, ct);
+    private readonly GrantService _grantService;
 
-    [HttpGet("{id:guid}")]
-    [ProducesResponseType<GrantDetailResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public Task<GrantDetailResponse> Get(Guid id, CancellationToken ct) =>
-        grants.GetAsync(id, ct);
-
-    [HttpPost("{id:guid}/tasks")]
-    [ProducesResponseType<TaskResponse>(StatusCodes.Status201Created)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<TaskResponse>> AddTask(Guid id, CreateTaskRequest request, CancellationToken ct)
+    public GrantsController(GrantService grantService)
     {
-        var task = await grants.AddTaskAsync(id, request, ct);
-        return CreatedAtAction(nameof(Get), new { id }, task);
+        _grantService = grantService;
     }
 
-    [HttpPut("{id:guid}/close")]
-    [ProducesResponseType<GrantSummaryResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status422UnprocessableEntity)]
-    public Task<GrantSummaryResponse> Close(Guid id, CancellationToken ct) =>
-        grants.CloseAsync(id, ct);
+    [HttpGet]
+    public async Task<ActionResult<List<GrantSummaryResponse>>> List(GrantStatus? status, CancellationToken ct)
+    {
+        var result = await _grantService.ListAsync(status, ct);
+        return Ok(result);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<GrantDetailResponse>> Get(Guid id, CancellationToken ct)
+    {
+        var result = await _grantService.GetAsync(id, ct);
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/tasks")]
+    public async Task<ActionResult<TaskResponse>> AddTask(Guid id, CreateTaskRequest request, CancellationToken ct)
+    {
+        var task = await _grantService.AddTaskAsync(id, request, ct);
+        return CreatedAtAction(nameof(Get), new { id = id }, task);
+    }
+
+    [HttpPut("{id}/close")]
+    public async Task<ActionResult<GrantSummaryResponse>> Close(Guid id, CancellationToken ct)
+    {
+        var result = await _grantService.CloseAsync(id, ct);
+        return Ok(result);
+    }
 }

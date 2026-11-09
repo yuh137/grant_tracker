@@ -1,4 +1,4 @@
-using GrantTracker.Api.Contracts;
+using GrantTracker.Api.DTO;
 using GrantTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,17 +6,26 @@ namespace GrantTracker.Api.Controllers;
 
 [ApiController]
 [Route("tasks")]
-[Produces("application/json")]
-public sealed class TasksController(TaskService tasks) : ControllerBase
+public class TasksController : ControllerBase
 {
-    [HttpGet("overdue")]
-    [ProducesResponseType<IReadOnlyList<OverdueTaskResponse>>(StatusCodes.Status200OK)]
-    public Task<IReadOnlyList<OverdueTaskResponse>> Overdue(CancellationToken ct) =>
-        tasks.OverdueAsync(ct);
+    private readonly TaskService _taskService;
 
-    [HttpPut("{id:guid}/complete")]
-    [ProducesResponseType<TaskResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
-    public Task<TaskResponse> Complete(Guid id, CancellationToken ct) =>
-        tasks.CompleteAsync(id, ct);
+    public TasksController(TaskService taskService)
+    {
+        _taskService = taskService;
+    }
+
+    [HttpGet("overdue")]
+    public async Task<ActionResult<IReadOnlyList<OverdueTaskResponse>>> Overdue(CancellationToken ct)
+    {
+        var result = await _taskService.OverdueAsync(ct);
+        return Ok(result);
+    }
+
+    [HttpPut("{id}/complete")]
+    public async Task<ActionResult<TaskResponse>> Complete(Guid id, CancellationToken ct)
+    {
+        var result = await _taskService.CompleteAsync(id, ct);
+        return Ok(result);
+    }
 }

@@ -5,33 +5,36 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrantTracker.Api.Errors;
 
-public sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+public class ApiExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken ct)
     {
-        var problem = exception switch
+        ProblemDetails problem = null;
+
+        if (exception is BusinessRuleException)
         {
-            BusinessRuleException rule => new ProblemDetails
-            {
-                Status = StatusCodes.Status422UnprocessableEntity,
-                Title = "Business rule violated",
-                Detail = rule.Message,
-                Extensions = { ["code"] = rule.Code }
-            },
-            NotFoundException notFound => new ProblemDetails
-            {
-                Status = StatusCodes.Status404NotFound,
-                Title = "Resource not found",
-                Detail = notFound.Message
-            },
-            DbUpdateConcurrencyException => new ProblemDetails
-            {
-                Status = StatusCodes.Status409Conflict,
-                Title = "Concurrent modification",
-                Detail = "The record was changed by another request. Reload it and try again."
-            },
-            _ => null
-        };
+            var rule = (BusinessRuleException)exception;
+            problem = new ();
+            problem.Status = 422;
+            problem.Title = "Business rule violated";
+            problem.Detail = rule.Message;
+            problem.Extensions.Add("code", rule.ErrorCode.ToString());
+        }
+        else if (exception is NotFoundException)
+        {
+            var notFound = (NotFoundException)exception;
+            problem = new ();
+            problem.Status = 404;
+            problem.Title = "Resource not found";
+            problem.Detail = notFound.Message;
+        }
+        else if (exception is DbUpdateConcurrencyException)
+        {
+            problem = new ();
+            problem.Status = 409;
+            problem.Title = "Concurrent modification";
+            problem.Detail = "The record was changed by another request. Reload it and try again.";
+        }
 
         if (problem is null)
         {

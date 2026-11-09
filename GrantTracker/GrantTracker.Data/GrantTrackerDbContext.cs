@@ -13,9 +13,9 @@ public class GrantTrackerDbContext(DbContextOptions<GrantTrackerDbContext> optio
         modelBuilder.Entity<Grant>(grant =>
         {
             grant.HasKey(g => g.Id);
-            grant.Property(g => g.Reference).HasMaxLength(20).IsRequired();
+            grant.Property(g => g.Reference).IsRequired();
             grant.HasIndex(g => g.Reference).IsUnique();
-            grant.Property(g => g.OrganisationName).HasMaxLength(200).IsRequired();
+            grant.Property(g => g.OrganisationName).IsRequired();
 
             grant.Property(g => g.Status).HasConversion<string>().HasMaxLength(10);
 
