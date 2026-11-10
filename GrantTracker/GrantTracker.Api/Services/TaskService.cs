@@ -22,15 +22,17 @@ public class TaskService(GrantTrackerDbContext db, TimeProvider timeProvider)
     public async Task<IReadOnlyList<OverdueTaskResponse>> OverdueAsync(CancellationToken ct)
     {
         var today = timeProvider.Today();
-        var overdue = await db.Tasks
+        var overdue = await OverdueQuery(db, today).ToListAsync(ct);
+
+        return overdue.Select(t => OverdueTaskResponse.From(t, today)).ToList();
+    }
+
+    public static IQueryable<GrantTask> OverdueQuery(GrantTrackerDbContext db, DateOnly today) =>
+        db.Tasks
             .AsNoTracking()
             .Include(t => t.Grant)
             .Where(GrantTask.OverdueOn(today))
             .OrderBy(t => t.DueDate)
             .ThenBy(t => t.Grant.Reference)
-            .ThenBy(t => t.Title)
-            .ToListAsync(ct);
-
-        return overdue.Select(t => OverdueTaskResponse.From(t, today)).ToList();
-    }
+            .ThenBy(t => t.Title);
 }

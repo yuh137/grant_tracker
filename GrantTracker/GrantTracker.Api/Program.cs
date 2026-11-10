@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
 using GrantTracker.Api;
 using GrantTracker.Api.Errors;
+using GrantTracker.Api.Health;
 using GrantTracker.Api.Services;
 using GrantTracker.Data;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +27,10 @@ builder.Services.AddDbContext<GrantTrackerDbContext>(options =>
 
 builder.Services.AddScoped<GrantService>();
 builder.Services.AddScoped<TaskService>();
+builder.Services.AddScoped<ReportService>();
+
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 
 var app = builder.Build();
 
@@ -37,6 +43,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResponseWriter = HealthResponseWriter.Write
+});
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = HealthResponseWriter.Write
+});
 
 using (var scope = app.Services.CreateScope())
 {

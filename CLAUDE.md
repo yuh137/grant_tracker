@@ -13,9 +13,9 @@ Repository root holds the solution folder `GrantTracker/`, the front end `GrantT
 |---|---|---|
 | `GrantTracker.Domain` | `Entities/` (with the business rules), `Enums/`, exceptions at the root | nothing |
 | `GrantTracker.Data` | `GrantTrackerDbContext`, EF configuration, seed data | Domain, EF Core |
-| `GrantTracker.Api` | Controllers, DTOs (`DTO/`), orchestration services, ProblemDetails mapping | Domain, Data |
+| `GrantTracker.Api` | Controllers, DTOs (`DTO/`), orchestration services, ProblemDetails mapping, health checks (`Health/`) | Domain, Data |
 | `GrantTracker.Tests` | xUnit: `Domain/` unit tests, `Api/` integration tests on in-memory SQLite + `FakeTimeProvider` | all |
-| `GrantTrackerApp/` | Vite + React + TypeScript single screen, Vitest; proxies `/grants` and `/tasks` to the API | API over HTTP |
+| `GrantTrackerApp/` | Vite + React + TypeScript single screen, Vitest. Proxies `/grants`, `/tasks` and `/reports` to the API | API over HTTP |
 
 ## Rules that must hold
 
@@ -26,8 +26,8 @@ Repository root holds the solution folder `GrantTracker/`, the front end `GrantT
   is the office's (`OfficeTimeZone`). Domain methods take `today` or `now` as a parameter.
 - Dates from people (application, due, completed) are `DateOnly`. Timestamps from the system
   (`CreatedOn`) are `DateTimeOffset`. Never `DateTime` on entities.
-- A rule violation throws `BusinessRuleException(BusinessRuleCode, message)`. Add new codes to the
-  `BusinessRuleCode` enum, never as strings. `ApiExceptionHandler` maps it to 422 ProblemDetails with a
+- A rule violation throws `BusinessRuleException(BusinessRuleErrorCode, message)`. Add new codes to the
+  `BusinessRuleErrorCode` enum, never as strings. `ApiExceptionHandler` maps it to 422 ProblemDetails with a
   `code` field holding the enum's name. The name is part of the API contract: renaming a value breaks clients.
   Unknown id: `NotFoundException` -> 404. `DbUpdateConcurrencyException` -> 409.
   Shape errors are 400 from model validation. Do not add other error shapes.
@@ -41,13 +41,12 @@ Repository root holds the solution folder `GrantTracker/`, the front end `GrantT
 
 ## Conventions
 
-- No code comments. Names and structure carry the meaning; explanations go in README or AI_USAGE.md.
 - British spelling in domain names (`OrganisationName`), matching the spec.
 - `GrantTask`, not `Task`, to avoid clashing with `System.Threading.Tasks.Task`.
-- Enums stored as strings. Keep it that way; the support team reads rows directly.
+- Enums stored as strings. Keep it that way, because the support team reads rows directly.
 - No new NuGet packages without saying why. `nuget.config` pins restore to nuget.org.
 - Front end: plain `fetch` in `src/api.ts`, no data library. `ConnectionError` means the API could not be
-  reached (rejected fetch, or a 5xx without a ProblemDetails body from a proxy); `ApiError` carries ProblemDetails.
+  reached (rejected fetch, or a 5xx without a ProblemDetails body from a proxy). `ApiError` carries ProblemDetails.
 
 ## Commands
 
@@ -60,6 +59,7 @@ npm --prefix GrantTrackerApp test                          # front-end tests
 ./test.sh                                                  # every test, one command (Git Bash on Windows)
 ```
 
+Health: `GET /health/live` (process only) and `GET /health/ready` (queries the grants table, 503 when it fails).
 OpenAPI document: `GET /openapi/v1.json` in Development. Requests to try: `GrantTracker/GrantTracker.Api/GrantTracker.Api.http`.
 
 ## Working with the AI
