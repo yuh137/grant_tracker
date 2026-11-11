@@ -31,6 +31,7 @@ public class GrantsController : ControllerBase
     }
 
     [HttpPost("{id}/tasks")]
+    [ProducesResponseType<TaskResponse>(StatusCodes.Status201Created)]
     public async Task<ActionResult<TaskResponse>> AddTask(Guid id, CreateTaskRequest request, CancellationToken ct)
     {
         var task = await _grantService.AddTaskAsync(id, request, ct);

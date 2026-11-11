@@ -60,7 +60,8 @@ npm --prefix GrantTrackerApp test                          # front-end tests
 ```
 
 Health: `GET /health/live` (process only) and `GET /health/ready` (queries the grants table, 503 when it fails).
-OpenAPI document: `GET /openapi/v1.json` in Development. Requests to try: `GrantTracker/GrantTracker.Api/GrantTracker.Api.http`.
+Swagger UI: `/swagger` in Development, over the OpenAPI document at `GET /openapi/v1.json`.
+Enums are text in both JSON settings (`AddJsonOptions` and `ConfigureHttpJsonOptions`). The OpenAPI document reads the second. Requests to try: `GrantTracker/GrantTracker.Api/GrantTracker.Api.http`.
 
 ## Working with the AI
 

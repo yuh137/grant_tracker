@@ -22,6 +22,7 @@ database and loads the seed data. Due dates are set relative to today, so there 
 tasks to look at.
 
 - Requests to try: `GrantTracker/GrantTracker.Api/GrantTracker.Api.http`
+- Swagger UI, to browse and try every endpoint: http://localhost:5180/swagger
 - OpenAPI document: http://localhost:5180/openapi/v1.json
 - Health: http://localhost:5180/health/live and http://localhost:5180/health/ready
 - Daily activity report: http://localhost:5180/reports/task-activity?days=14
@@ -85,6 +86,10 @@ has the same result as doing them once.
 | 404 | The grant or task does not exist. |
 | 409 | Another officer changed the grant at the same moment. Reload and try again. |
 | 422 | A business rule was broken. The body has a `code` such as `GrantClosed` or `InvalidDueDate`. |
+
+**API documentation.** .NET's built-in OpenAPI support generates the document, and the
+`Swashbuckle.AspNetCore.SwaggerUI` package serves the page for it. Both are on in Development
+only. The document does not yet describe the error responses.
 
 **Completing a task that is already completed (BR-4).** The API returns 200 with the task
 unchanged, keeping the original completion date. If the first response is lost and the officer
