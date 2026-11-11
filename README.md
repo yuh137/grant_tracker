@@ -21,11 +21,9 @@ The API listens on http://localhost:5180. Each time it starts in Development it 
 database and loads the seed data. Due dates are set relative to today, so there are always overdue
 tasks to look at.
 
-- Requests to try: `GrantTracker/GrantTracker.Api/GrantTracker.Api.http`
 - Swagger UI, to browse and try every endpoint: http://localhost:5180/swagger
-- OpenAPI document: http://localhost:5180/openapi/v1.json
-- Health: http://localhost:5180/health/live and http://localhost:5180/health/ready
-- Daily activity report: http://localhost:5180/reports/task-activity?days=14
+- Health checks, not listed in Swagger: http://localhost:5180/health/live and
+  http://localhost:5180/health/ready
 
 ### 2. Start the front end
 
